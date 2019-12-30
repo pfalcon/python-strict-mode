@@ -67,6 +67,9 @@ class MyLoader:
         src = self.sub.get_source(modname)
         mod = make_module(modname, fname, src)
 
+        if fname.endswith("/__init__.py"):
+            mod.__path__ = [os.path.dirname(fname)]
+
         return mod
 
 
