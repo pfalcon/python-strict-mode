@@ -11,17 +11,12 @@ class MyPathFinder:
     def __init__(self, sub):
         self.sub = sub
 
-    def find_module(self, *args):
-        loader = self.sub.find_module(*args)
-        print("find_module", args, "->", loader)
-        if loader:
-            print(loader.get_filename())
-            return MyLoader(loader)
-
-    def _find_spec(self, *args):
-        res = self.sub.find_spec(*args)
-        print("find_spec", args, "->", res)
-        return res
+    def find_spec(self, fullname, path, target_mod):
+        spec = self.sub.find_spec(fullname, path, target_mod)
+        print("find_spec", (fullname, path, target_mod), "->", spec)
+        if spec.loader:
+            spec.loader = MyLoader(spec.loader)
+        return spec
 
 
 def make_module(modname, fname, src, sysname=None):
