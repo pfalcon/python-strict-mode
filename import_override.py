@@ -14,7 +14,7 @@ class MyPathFinder:
     def find_spec(self, fullname, path, target_mod):
         spec = self.sub.find_spec(fullname, path, target_mod)
         print("find_spec", (fullname, path, target_mod), "->", spec)
-        if spec.loader:
+        if spec and spec.loader and spec.origin.endswith(".py"):
             spec.loader = MyLoader(spec.loader)
         return spec
 
