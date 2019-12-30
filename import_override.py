@@ -21,20 +21,23 @@ class MyPathFinder:
 
 def make_module(modname, fname, src, sysname=None):
     print("make_module", modname)
-    tree = ast.parse(src)
-#    print(ast.dump(tree))
-
     shortname = modname.rsplit(".", 1)[-1]
     mod = imp.new_module(shortname)
+    mod.__file__ = fname
+    mod = populate_module(mod, src)
+    sys.modules[sysname or modname] = mod
+    return mod
+
+
+def populate_module(mod, src):
+    tree = ast.parse(src)
+#    print(ast.dump(tree))
     globals_dict = mod.__dict__
-    globals_dict["__file__"] = fname
     print("newly inited module dict:", globals_dict)
 
-    co = compile(tree, fname, "exec")
-    sys.modules[sysname or modname] = mod
+    co = compile(tree, mod.__file__, "exec")
     exec(co, globals_dict)
     print(globals_dict.keys())
-
     return mod
 
 
@@ -44,28 +47,13 @@ class MyLoader:
         print("MyLoader:", sub)
         self.sub = sub
 
-    def load_module(self, modname):
-        mod = self.my_load_module(modname)
-        #mod = self.sub.load_module(modname)
-        ns = mod.__dict__.copy()
-        ns.pop("__builtins__")
-        print(modname, ":", ns)
-        return mod
+    def create_module(self, spec):
+        return None
 
-    def my_load_module(self, modname):
-        mod = None
-        print("load_module", modname)
-        if modname in sys.modules:
-            return sys.modules[modname]
-
-        fname = self.sub.get_filename(modname)
-        src = self.sub.get_source(modname)
-        mod = make_module(modname, fname, src)
-
-        if fname.endswith("/__init__.py"):
-            mod.__path__ = [os.path.dirname(fname)]
-
-        return mod
+    def exec_module(self, mod):
+        print("exec_module", mod)
+        src = self.sub.get_source(mod.__name__)
+        return populate_module(mod, src)
 
 
 fname = sys.argv[1]
