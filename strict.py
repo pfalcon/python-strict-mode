@@ -73,6 +73,9 @@ class ROProxy:
             log.error("Attempt to set %s.%s to %r" % (self, k, v))
             raise StrictModeError("Attempt to set %s.%s to %r" % (self, k, v))
 
+    def __dir__(self):
+        return dir(self._o__)
+
     def __repr__(self):
         return "<ro %s>" % self._o__
 
