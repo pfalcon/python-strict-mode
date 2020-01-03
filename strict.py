@@ -125,6 +125,8 @@ class ProxyPathFinder:
         self.sub = sub
 
     def find_spec(self, fullname, path, target_mod):
+        if is_runtime:
+            log.warning("Attempt to import module %r at runtime, will likely fail" % fullname)
         spec = self.sub.find_spec(fullname, path, target_mod)
         log.debug("find_spec: %s -> %s" % ((fullname, path, target_mod), spec))
         if spec and spec.loader and spec.origin.endswith(".py"):
