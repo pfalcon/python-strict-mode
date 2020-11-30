@@ -4,6 +4,43 @@ import imp
 from types import ModuleType, MappingProxyType
 
 
+# Guess what - can't use logging is some special classes below,
+# so mock own logging.
+class MiniLog:
+
+    DEBUG = 10
+    INFO = 20
+    WARNING = 30
+    ERROR = 40
+
+    def __init__(self, name):
+        self.name = name
+        self.level = self.DEBUG
+
+    def setLevel(self, level):
+        self.level = level
+
+    def log(self, level, msg):
+        if level >= self.level:
+            sys.stderr.write("%s: %s\n" % (self.name, msg))
+
+    def debug(self, msg):
+        self.log(self.DEBUG, msg)
+
+    def info(self, msg):
+        self.log(self.INFO, msg)
+
+    def warning(self, msg):
+        self.log(self.WARNING, msg)
+
+    def error(self, msg):
+        self.log(self.ERROR, msg)
+
+
+log = MiniLog("strict")
+log.setLevel(log.WARNING)
+
+
 class StrictModeError(RuntimeError):
     pass
 
